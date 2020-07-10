@@ -89,6 +89,19 @@ RUN wget https://download.osgeo.org/postgis/source/postgis-3.0.0.tar.gz -O postg
  && make -j $(nproc) install \
  && cd .. && rm -rf postgis_src
 
+ RUN wget https://github.com/pgRouting/pgrouting/releases/download/v3.0.1/pgrouting-3.0.1.tar.gz -O pgrouting.tar.gz \
+  && mkdir -p pgrouting_src \
+  && tar -xvzf pgrouting.tar.gz --strip 1 -C pgrouting_src \
+  && rm pgrouting.tar.gz \
+  && cd pgrouting_src \
+  && mkdir build \
+  && cd build \
+  && cmake .. \
+  && make -j $(nproc) \
+  && make -j $(nproc) install \
+  && cd .. && rm -rf pgrouting_src
+
+
 # Set up renderer user
 RUN adduser --disabled-password --gecos "" renderer
 

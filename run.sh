@@ -36,6 +36,7 @@ if [ "$1" = "import" ]; then
     sudo -u postgres createuser renderer
     sudo -u postgres createdb -E UTF8 -O renderer gis
     sudo -u postgres psql -d gis -c "CREATE EXTENSION postgis;"
+    sudo -u postgres psql -d gis -c "CREATE EXTENSION pgrouting;"
     sudo -u postgres psql -d gis -c "CREATE EXTENSION hstore;"
     sudo -u postgres psql -d gis -c "ALTER TABLE geometry_columns OWNER TO renderer;"
     sudo -u postgres psql -d gis -c "ALTER TABLE spatial_ref_sys OWNER TO renderer;"
@@ -77,6 +78,10 @@ if [ "$1" = "import" ]; then
 
     # Create indexes
     sudo -u postgres psql -d gis -f indexes.sql
+
+    sudo -u postgres psql -d gis -c "ALTER TABLE planet_osm_roads ADD COLUMN \"source\" integer;"
+    sudo -u postgres psql -d gis -c "ALTER TABLE planet_osm_roads ADD COLUMN \"target\" integer;"
+    sudo -u postgres psql -d gis -c "SELECT pgr_createTopology('planet_osm_roads', 0.00001, 'way', 'osm_id');"
 
     # Register that data has changed for mod_tile caching purposes
     touch /var/lib/mod_tile/planet-import-complete
